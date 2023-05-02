@@ -48,35 +48,89 @@
   <body>
     <canvas id="canvas"></canvas>
     <canvas id="imageCanvas"></canvas>
-    <div class="github">Source Code : <a href="https://github.com/Jonorusc/" target="_blank">Github</a></div>
+    <div class="github">Source Code: 
+      <a href="https://github.com/Jonorusc/" target="_blank">Github</a>
+    </div>
+    <select id="deviceList"></select>
     <button onclick="reset()">reset state</button>
     <button onclick="download()">download</button>
 
     <script>
       const canvas = document.getElementById("canvas")
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      const ctx = canvas.getContext("2d", { willReadFrequently: true })
       const imageCanvas = document.getElementById("imageCanvas")
       const imageCtx = imageCanvas.getContext("2d")
 
+      let deviceId = null
+
+      if (!navigator.mediaDevices?.enumerateDevices) {
+        console.log("enumerateDevices() not supported.")
+      } else {
+        // List cameras and microphones.
+        navigator.mediaDevices
+          .enumerateDevices()
+          .then(async (devices) => {
+            // set the first device which has the videoinput as the default device
+            deviceId =  devices.find((device) => device.kind === "videoinput").deviceId
+
+            devices.forEach((device) => {
+              if (device.kind === "videoinput") {
+                const option = document.createElement("option")
+                option.value = device.deviceId
+                option.text = device.label || `Camera ${device.deviceId}`
+                document.getElementById("deviceList").appendChild(option)
+              }
+            })
+
+            startVideo()
+
+          })
+          .catch((err) => {
+            console.error(`${err.name}: ${err.message}`)
+          })
+      }
+
+
       // Set the canvas dimensions to match the video
       const video = document.createElement("video")
-      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-        video.srcObject = stream
-        video.play()
-        video.addEventListener("loadedmetadata", () => {
-          canvas.width = video.videoWidth
-          canvas.height = video.videoHeight
-          imageCanvas.width = video.videoWidth
-          imageCanvas.height = video.videoHeight
-          animate()
-        })
-      })
-
       // Set up the freeze frame effect
       const lineWidth = 5 // Width of the line
       const speed = 1 // Speed of the line in pixels per frame
       let linePos = 0 // Current position of the line
       let imageChunks = [] // Array to store the generated image chunks
+      let animationId = null // ID of the animation frame
+
+      document.getElementById("deviceList").addEventListener("change", (event) => {
+        deviceId = event.target.value
+        reset()
+        startVideo()
+      })
+
+      function startVideo() {
+        const constraints = {
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30 },
+            facingMode: { ideal: "environment" },
+            // Definir o codec de vídeo para H.264
+            codec: "h264",
+            deviceId,
+          },
+        }
+
+        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+          video.srcObject = stream
+          video.play()
+          video.addEventListener("loadedmetadata", () => {
+            canvas.width = video.videoWidth
+            canvas.height = video.videoHeight
+            imageCanvas.width = video.videoWidth
+            imageCanvas.height = video.videoHeight
+            animate()
+          })
+        })
+      }
 
       function animate() {
         // Draw the current video frame onto the canvas
@@ -89,13 +143,14 @@
         ctx.moveTo(0, linePos)
         ctx.lineTo(canvas.width, linePos)
         ctx.stroke()
+        const buffer = 8 // Buffer to add above and below the line
 
-        const chunkHeight = canvas.height / 60
+        const chunkHeight = canvas.height / 120 + lineWidth  // Height of each image chunk
         // Generate the image chunk every of the video height
         if (linePos % chunkHeight <= speed) {
           const currentChunkIndex = Math.floor(linePos / chunkHeight)
-          const imgData = ctx.getImageData(0, currentChunkIndex * chunkHeight + 5, canvas.width, chunkHeight)
-          imageChunks.push({ imgData, height: linePos - chunkHeight + 5 })
+          const imgData = ctx.getImageData(0, currentChunkIndex * chunkHeight + lineWidth, canvas.width, chunkHeight)
+          imageChunks.push({ imgData, height: linePos - chunkHeight + lineWidth })
         }
 
         // Move the line down
@@ -124,12 +179,11 @@
       function download() {
         const a = document.createElement("a")
         a.download = "yourQueerImage.png"
-        a.href = imageCanvas.toDataURL("image/png");
+        a.href = imageCanvas.toDataURL("image/png")
         a.click()
       }
     </script>
   </body>
 </html>
-
 
 <!-- REMEMBER: there are many ways to create this effect and much better ways in which I have created it. If you want to improve the code, feel free -->
