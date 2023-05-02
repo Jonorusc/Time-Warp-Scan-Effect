@@ -27,10 +27,21 @@
       .github {
         color: white;
         font-size: 1.2rem;
+        padding: 0.4rem;
       }
       .github a {
         text-decoration: none;
         color: blue;
+      }
+      button {
+        font-size: 1.2rem;
+        padding: 10px;
+        border: 1px solid white;
+        background-color: transparent;
+        color: white;
+        cursor: pointer;
+        margin: 0.4rem;
+        display: block;
       }
     </style>
   </head>
@@ -38,74 +49,87 @@
     <canvas id="canvas"></canvas>
     <canvas id="imageCanvas"></canvas>
     <div class="github">Source Code : <a href="https://github.com/Jonorusc/" target="_blank">Github</a></div>
+    <button onclick="reset()">reset state</button>
+    <button onclick="download()">download</button>
+
     <script>
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-      const imageCanvas = document.getElementById("imageCanvas");
-      const imageCtx = imageCanvas.getContext("2d");
+      const canvas = document.getElementById("canvas")
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      const imageCanvas = document.getElementById("imageCanvas")
+      const imageCtx = imageCanvas.getContext("2d")
 
       // Set the canvas dimensions to match the video
-      const video = document.createElement("video");
+      const video = document.createElement("video")
       navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-        video.srcObject = stream;
-        video.play();
+        video.srcObject = stream
+        video.play()
         video.addEventListener("loadedmetadata", () => {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          imageCanvas.width = video.videoWidth;
-          imageCanvas.height = video.videoHeight;
-          animate();
-        });
-      });
+          canvas.width = video.videoWidth
+          canvas.height = video.videoHeight
+          imageCanvas.width = video.videoWidth
+          imageCanvas.height = video.videoHeight
+          animate()
+        })
+      })
 
       // Set up the freeze frame effect
-      const lineWidth = 5; // Width of the line
-      const speed = 1; // Speed of the line in pixels per frame
-      let linePos = 0; // Current position of the line
-      const imageChunks = []; // Array to store the generated image chunks
+      const lineWidth = 5 // Width of the line
+      const speed = 1 // Speed of the line in pixels per frame
+      let linePos = 0 // Current position of the line
+      let imageChunks = [] // Array to store the generated image chunks
 
       function animate() {
         // Draw the current video frame onto the canvas
-        ctx.drawImage(video, 0, 0);
+        ctx.drawImage(video, 0, 0)
 
         // Draw the line
-        ctx.beginPath();
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = "#00FFFFFF";
-        ctx.moveTo(0, linePos);
-        ctx.lineTo(canvas.width, linePos);
-        ctx.stroke();
+        ctx.beginPath()
+        ctx.lineWidth = lineWidth
+        ctx.strokeStyle = "#00FFFFFF"
+        ctx.moveTo(0, linePos)
+        ctx.lineTo(canvas.width, linePos)
+        ctx.stroke()
 
-        const chunkHeight = canvas.height / 60;
+        const chunkHeight = canvas.height / 60
         // Generate the image chunk every of the video height
         if (linePos % chunkHeight <= speed) {
-          const currentChunkIndex = Math.floor(linePos / chunkHeight);
-          const imgData = ctx.getImageData(
-            0,
-            currentChunkIndex * chunkHeight + 5,
-            canvas.width,
-            chunkHeight
-          );
-          imageChunks.push({ imgData, height: linePos - chunkHeight + 5 });
+          const currentChunkIndex = Math.floor(linePos / chunkHeight)
+          const imgData = ctx.getImageData(0, currentChunkIndex * chunkHeight + 5, canvas.width, chunkHeight)
+          imageChunks.push({ imgData, height: linePos - chunkHeight + 5 })
         }
 
         // Move the line down
-        linePos += speed;
+        linePos += speed
 
-        // imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height)
         for (let i = 0; i < imageChunks.length; i++) {
-          let chunk = imageChunks[i];
-          imageCtx.putImageData(chunk.imgData, 0, chunk.height);
+          let chunk = imageChunks[i]
+          imageCtx.putImageData(chunk.imgData, 0, chunk.height)
         }
+
         // Check if animation is finished
-        if (linePos >= canvas.height + lineWidth) {
-          cancelAnimationFrame(animationId);
-        } else {
-          animationId = requestAnimationFrame(animate);
-        }
+        if (linePos >= canvas.height + lineWidth) cancelAnimationFrame(animationId)
+        else animationId = requestAnimationFrame(animate)
+      }
+
+      function reset() {
+        // Reset animation
+        linePos = 0
+        imageChunks = []
+        cancelAnimationFrame(animationId)
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        imageCtx.clearRect(0, 0, canvas.width, canvas.height)
+        animate()
+      }
+
+      function download() {
+        const a = document.createElement("a")
+        a.download = "yourQueerImage.png"
+        a.href = imageCanvas.toDataURL("image/png");
+        a.click()
       }
     </script>
   </body>
 </html>
+
 
 <!-- REMEMBER: there are many ways to create this effect and much better ways in which I have created it. If you want to improve the code, feel free -->
