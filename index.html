@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tiktok Time Warp Scan Effect</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        position: relative;
+      }
+      canvas {
+        display: block;
+        margin: 0 auto;
+      }
+      #canvas,
+      #imageCanvas {
+        width: 70vw;
+        height: 100vh;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <canvas id="imageCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const imageCanvas = document.getElementById("imageCanvas");
+      const imageCtx = imageCanvas.getContext("2d");
+
+      // Set the canvas dimensions to match the video
+      const video = document.createElement("video");
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        video.srcObject = stream;
+        video.play();
+        video.addEventListener("loadedmetadata", () => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          imageCanvas.width = video.videoWidth;
+          imageCanvas.height = video.videoHeight;
+          animate();
+        });
+      });
+
+      // Set up the freeze frame effect
+      const lineWidth = 5; // Width of the line
+      const speed = 1; // Speed of the line in pixels per frame
+      let linePos = 0; // Current position of the line
+      const imageChunks = []; // Array to store the generated image chunks
+
+      function animate() {
+        // Draw the current video frame onto the canvas
+        ctx.drawImage(video, 0, 0);
+
+        // Draw the line
+        ctx.beginPath();
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = "#00FFFFFF";
+        ctx.moveTo(0, linePos);
+        ctx.lineTo(canvas.width, linePos);
+        ctx.stroke();
+
+        const chunkHeight = canvas.height / 60;
+        // Generate the image chunk every of the video height
+        if (linePos % chunkHeight <= speed) {
+          const currentChunkIndex = Math.floor(linePos / chunkHeight);
+          const imgData = ctx.getImageData(
+            0,
+            currentChunkIndex * chunkHeight + 5,
+            canvas.width,
+            chunkHeight
+          );
+          imageChunks.push({ imgData, height: linePos - chunkHeight + 5 });
+        }
+
+        // Move the line down
+        linePos += speed;
+
+        // imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height)
+        for (let i = 0; i < imageChunks.length; i++) {
+          let chunk = imageChunks[i];
+          imageCtx.putImageData(chunk.imgData, 0, chunk.height);
+        }
+        // Check if animation is finished
+        if (linePos >= canvas.height + lineWidth) {
+          cancelAnimationFrame(animationId);
+        } else {
+          animationId = requestAnimationFrame(animate);
+        }
+      }
+    </script>
+  </body>
+</html>
