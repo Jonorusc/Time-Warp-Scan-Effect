@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Tiktok Time Warp Scan Effect</title>
+    <title>Tiktok Time Warp Effect</title>
     <style>
       body {
         margin: 0;
         padding: 0;
         position: relative;
+        background-color: aqua;
+        overflow: hidden;
       }
       canvas {
         display: block;
         margin: 0 auto;
+        border: 1px solid white;
       }
       #canvas,
       #imageCanvas {
@@ -18,14 +21,23 @@
         height: 100vh;
         position: absolute;
         left: 50%;
+        top: 0;
         transform: translateX(-50%);
+      }
+      .github {
+        color: white;
+        font-size: 1.2rem;
+      }
+      .github a {
+        text-decoration: none;
+        color: blue;
       }
     </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
     <canvas id="imageCanvas"></canvas>
-
+    <div class="github">Source Code : <a href="https://github.com/Jonorusc/" target="_blank">Github</a></div>
     <script>
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
@@ -95,3 +107,5 @@
     </script>
   </body>
 </html>
+
+<!-- REMEMBER: there are many ways to create this effect and much better ways in which I have created it. If you want to improve the code, feel free -->
