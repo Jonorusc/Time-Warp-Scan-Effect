@@ -48,7 +48,8 @@
   <body>
     <canvas id="canvas"></canvas>
     <canvas id="imageCanvas"></canvas>
-    <div class="github">Source Code: 
+    <div class="github">
+      Source Code:
       <a href="https://github.com/Jonorusc/" target="_blank">Github</a>
     </div>
     <select id="deviceList"></select>
@@ -71,7 +72,7 @@
           .enumerateDevices()
           .then(async (devices) => {
             // set the first device which has the videoinput as the default device
-            deviceId =  devices.find((device) => device.kind === "videoinput").deviceId
+            deviceId = devices.find((device) => device.kind === "videoinput").deviceId
 
             devices.forEach((device) => {
               if (device.kind === "videoinput") {
@@ -83,22 +84,20 @@
             })
 
             startVideo()
-
           })
           .catch((err) => {
             console.error(`${err.name}: ${err.message}`)
           })
       }
 
-
       // Set the canvas dimensions to match the video
       const video = document.createElement("video")
       // Set up the freeze frame effect
-      const lineWidth = 5 // Width of the line
+      const lineWidth = 3 // Width of the line
       const speed = 1 // Speed of the line in pixels per frame
       let linePos = 0 // Current position of the line
-      let imageChunks = [] // Array to store the generated image chunks
-      let animationId = null // ID of the animation frame
+      let imageChunks = [] // Array to store the generated image chunks - {imgData: ImageData, height: number}[]
+      let animationId = null // ID of the animation frame - null | number
 
       document.getElementById("deviceList").addEventListener("change", (event) => {
         deviceId = event.target.value
@@ -145,12 +144,12 @@
         ctx.stroke()
         const buffer = 8 // Buffer to add above and below the line
 
-        const chunkHeight = canvas.height / 120 + lineWidth  // Height of each image chunk
+        const chunkHeight = canvas.height / 240 + lineWidth // Height of each image chunk
         // Generate the image chunk every of the video height
         if (linePos % chunkHeight <= speed) {
           const currentChunkIndex = Math.floor(linePos / chunkHeight)
           const imgData = ctx.getImageData(0, currentChunkIndex * chunkHeight + lineWidth, canvas.width, chunkHeight)
-          imageChunks.push({ imgData, height: linePos - chunkHeight + lineWidth })
+          imageChunks.push({ imgData, height: linePos - chunkHeight - lineWidth })
         }
 
         // Move the line down
