@@ -53,7 +53,7 @@ Using this css block:
 }
 ```
 
-the two canvases are positioned in the same position, however. The second only appears when there are pieces of images to assemble, and when that happens it superimposes the video canvas, generating the effect
+the two canvas are positioned in the same position, however. The second only appears when there are pieces of images to assemble, and when that happens it superimposes the video canvas, generating the effect
 
 ## Did you like it?
 What do you think about creating a fork and modifying it your way?
