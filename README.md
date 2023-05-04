@@ -57,6 +57,3 @@ the two canvases are positioned in the same position, however. The second only a
 
 ## Did you like it?
 What do you think about creating a fork and modifying it your way?
-
-## Outcome
-![](TimeWarpScanEffect.gif)
