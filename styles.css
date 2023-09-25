@@ -1,0 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  position: relative;
+  background: #020024;
+  background: linear-gradient(90deg, #020024 0%, #090979 35%, #00d4ff 100%);
+  /* overflow: hidden; */
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.canvas-area {
+  border: 1px solid #f2f2f2;
+  width: 70vw;
+  height: calc(100vh - 20px);
+  margin: 10px 0;
+  position: relative;
+}
+
+.canvas-area.blocked::before {
+  content: attr(title);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f2f2f2;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  color: #020024;
+}
+
+canvas {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+#canvas,
+#imageCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.actions {
+  display: flex;
+  align-self: flex-start;
+  flex-direction: column;
+}
+
+.github {
+  color: white;
+  font-size: 1.5rem;
+  padding: 0.4rem;
+}
+.github a {
+  text-decoration: none;
+  color: 090979;
+}
+button {
+  font-size: 1rem;
+  padding: 1.2rem;
+  background-color: #090979;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+  display: block;
+  width: 250px;
+  text-transform: capitalize;
+  border: none;
+  outline: none;
+}
+
+button:hover {
+  filter: brightness(1.75);
+}
+
+button:active {
+  filter: brightness(1.95);
+  transform: scale(0.98);
+}
+
+select {
+  margin-bottom: 0.4rem;
+  padding: 1.2rem;
+  font-size: 1rem;
+  border: none;
+  background-color: #090979;
+  color: white;
+  width: 250px;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+select:hover {
+  border-color: #999;
+}
+
+select:focus,
+button:focus {
+  outline: none;
+  box-shadow: 0 0 5px #f2f2f2;
+}
+
+select option {
+  background-color: #fff;
+  color: #333;
+  padding: 5px 10px;
+}
+
+select:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
