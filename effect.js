@@ -24,8 +24,10 @@ class TimeWarp {
   animate() {
     this.videoCtx.save() // Save the current canvas state
     this.videoCtx.scale(-1, 1) // Invert horizontally (mirror effect)
-    this.videoCtx.drawImage(this.video, -this.videoCanvas.width, 0) // Draw the inverted video
-    this.videoCtx.restore() // Restore the canvas state
+    this.videoCtx.drawImage(this.video, -this.videoCanvas.width, 0) // Draw the inverted video horizontally
+    // reset the transform-matrix
+    this.videoCtx.setTransform(1, 0, 0, 1, 0, 0)
+
     // draws the result image onto the image canvas
     this.imageChunks.forEach((chunk) => {
       this.imageCtx.putImageData(chunk.imgData, 0, chunk.height)
