@@ -40,7 +40,7 @@ class TimeWarp {
     this.videoCtx.lineTo(this.videoCanvas.width, this.linePos)
     this.videoCtx.stroke()
 
-    const chunkHeight = 0.5 + this.lineWidth // Set chunkHeight to 1/2 pixel
+    const chunkHeight = 0.25 + this.lineWidth // Set chunkHeight *use as pixel*
     // Generate the image chunk every of the video height
     if (this.linePos % chunkHeight <= this.speed) {
       const currentChunkIndex = Math.floor(this.linePos / chunkHeight)
